@@ -383,15 +383,15 @@ class MainActivity : ComponentActivity(), MotionSensor.Listener {
             return
         }
 
-        // Si cualquier pregunta está cortada o le faltan opciones, no resolvemos
-        // una página parcial ni lanzamos mensajes Morse largos: pedimos otra foto.
+        // Un enunciado cortado no se puede resolver con fiabilidad: se pide otra foto.
+        // Si solo faltan algunas opciones, se envían las visibles al motor de resolución.
         val preguntasIncompletas = lectura.incompletas
         if (preguntasIncompletas.isNotEmpty()) {
             pararCamara()
             estado = Estado.REPOSO
             motion.golpesActivos = true
             sesion = null
-            status("Pregunta incompleta · 3 golpes para repetir la foto")
+            status("Enunciado ilegible · 3 golpes para repetir la foto")
             texto("No se ha corregido la página")
             haptics.play(Patron.FOTO_INCOMPLETA)
             return
