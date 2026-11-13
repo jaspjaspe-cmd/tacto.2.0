@@ -56,10 +56,33 @@ class Haptics(context: Context) {
     fun playRaw(tiempos: LongArray) {
         if (tiempos.size < 2) return
         vibrator.cancel()
-        val amplitud = intArrayOf(0, 45, 85, 130, 190, 255)[intensidad]
-        val amplitudes = IntArray(tiempos.size) { i -> if (i % 2 == 0) 0 else amplitud }
-        vibrator.vibrate(VibrationEffect.createWaveform(tiempos, amplitudes, -1))
-        ocupadoHastaMs = SystemClock.elapsedRealtime() + tiempos.sum() + 150
+
+        // En móviles con control de amplitud reducimos mucho el nivel mínimo.
+        // En móviles sin ese soporte, Android ignora las amplitudes: reducimos
+        // la duración de cada pulso para evitar que el nivel 1 salga a potencia máxima.
+        val tieneControlAmplitud =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && vibrator.hasAmplitudeControl()
+
+        val tiemposAplicados = if (tieneControlAmplitud) {
+            tiempos
+        } else {
+            val factorDuracion = floatArrayOf(0f, 0.25f, 0.40f, 0.58f, 0.78f, 1.0f)[intensidad]
+            LongArray(tiempos.size) { i ->
+                if (i % 2 == 1) (tiempos[i] * factorDuracion).toLong().coerceAtLeast(1L)
+                else tiempos[i]
+            }
+        }
+
+        if (tieneControlAmplitud) {
+            val amplitud = intArrayOf(0, 12, 28, 55, 100, 160)[intensidad]
+            val amplitudes = IntArray(tiemposAplicados.size) { i ->
+                if (i % 2 == 0) 0 else amplitud
+            }
+            vibrator.vibrate(VibrationEffect.createWaveform(tiemposAplicados, amplitudes, -1))
+        } else {
+            vibrator.vibrate(VibrationEffect.createWaveform(tiemposAplicados, -1))
+        }
+        ocupadoHastaMs = SystemClock.elapsedRealtime() + tiemposAplicados.sum() + 150
     }
 
     fun cancel() {
