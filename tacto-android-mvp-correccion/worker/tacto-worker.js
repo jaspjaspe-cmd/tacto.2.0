@@ -107,7 +107,7 @@ async function resolver(body, env) {
   const conteo = new Map();
   for (const p of preguntas) conteo.set(p.numero, (conteo.get(p.numero) || 0) + 1);
   const duplicados = new Set([...conteo.entries()].filter(([, n]) => n > 1).map(([num]) => num));
-  const unicas = preguntas.filter(p => !duplicados.has(p.numero) && p.opciones_completas && p.opciones.length >= 2);
+  const unicas = preguntas.filter(p => !duplicados.has(p.numero) && p.opciones.length >= 2);
 
   let soluciones = [];
   if (unicas.length > 0) {
@@ -123,9 +123,10 @@ async function resolver(body, env) {
 
     const instrucciones = `${listado}
 
-Resuelve cada pregunta usando únicamente el enunciado, las opciones y conocimiento general fiable.
-No presupongas que una opción es correcta por parecer familiar.
-Si hay más de una respuesta defendible, falta contexto, depende de un texto no incluido o no puedes determinarla con seguridad, devuelve letra:null y confianza:"baja".
+Resuelve cada pregunta usando únicamente el enunciado, las opciones visibles y conocimiento general fiable.
+Algunas preguntas pueden tener opciones incompletas porque la fotografía no captó todas. Evalúa las opciones visibles: si una de ellas es claramente correcta por sí misma, puedes responder aunque falten otras opciones.
+No supongas que una opción es correcta por parecer familiar ni elijas simplemente la mejor de las visibles si el enunciado exige comparar todas las alternativas.
+Si falta contexto esencial, hay más de una respuesta defendible o no puedes confirmar que una opción visible sea correcta con seguridad, devuelve letra:null y confianza:"baja".
 Devuelve confianza:"alta" solo cuando la respuesta sea inequívoca.
 
 Devuelve SOLO JSON válido, sin Markdown ni texto adicional:
@@ -149,7 +150,7 @@ Devuelve SOLO JSON válido, sin Markdown ni texto adicional:
     if (duplicados.has(p.numero)) {
       return { numero: p.numero, estado: "indeterminada", confianza: "baja", motivo: "numero_duplicado" };
     }
-    if (!p.opciones_completas || p.opciones.length < 2) {
+    if (p.opciones.length < 2) {
       return { numero: p.numero, estado: "indeterminada", confianza: "baja", motivo: "opciones_incompletas" };
     }
     const sol = mapa.get(p.numero);
