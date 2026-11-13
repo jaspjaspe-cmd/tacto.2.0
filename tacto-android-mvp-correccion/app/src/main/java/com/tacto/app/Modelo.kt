@@ -68,9 +68,8 @@ data class Lectura(
                         opcionesCompletas = p.optBoolean("opciones_completas", true)
                     )
                 )
-                if (!p.optBoolean("opciones_completas", true)) {
-                    incompletas.add(numero)
-                }
+                // Las opciones ausentes no bloquean toda la pregunta: se evalúan
+                // las opciones visibles y el motor puede abstenerse si no son concluyentes.
             }
 
             val ordenadas = completas.sortedBy { it.numero }
