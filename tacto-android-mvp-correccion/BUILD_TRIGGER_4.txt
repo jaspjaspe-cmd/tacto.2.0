@@ -1,0 +1,1 @@
+Build attempt with explicit SDK packages.
