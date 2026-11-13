@@ -68,6 +68,9 @@ data class Lectura(
                         opcionesCompletas = p.optBoolean("opciones_completas", true)
                     )
                 )
+                if (!p.optBoolean("opciones_completas", true)) {
+                    incompletas.add(numero)
+                }
             }
 
             val ordenadas = completas.sortedBy { it.numero }
