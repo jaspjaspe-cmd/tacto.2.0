@@ -383,6 +383,20 @@ class MainActivity : ComponentActivity(), MotionSensor.Listener {
             return
         }
 
+        // Si cualquier pregunta está cortada o le faltan opciones, no resolvemos
+        // una página parcial ni lanzamos mensajes Morse largos: pedimos otra foto.
+        val preguntasIncompletas = lectura.incompletas
+        if (preguntasIncompletas.isNotEmpty()) {
+            pararCamara()
+            estado = Estado.REPOSO
+            motion.golpesActivos = true
+            sesion = null
+            status("Pregunta incompleta · 3 golpes para repetir la foto")
+            texto("No se ha corregido la página")
+            haptics.play(Patron.FOTO_INCOMPLETA)
+            return
+        }
+
         pararCamara()
         sesion = s
 
@@ -391,25 +405,11 @@ class MainActivity : ComponentActivity(), MotionSensor.Listener {
         val pulsos = Haptics.pulsosAgrupados(s.preguntas.size)
         haptics.playRaw(pulsos)
 
-        val avisos = buildString {
-            if (lectura.incompletas.isNotEmpty()) {
-                append("PREGUNTA CORTADA ").append(lectura.incompletas.joinToString(" ")).append(' ')
-            }
-            if (lectura.saltos.isNotEmpty()) {
-                append("SALTO NUMERACION ").append(lectura.saltos.joinToString(" "))
-            }
-        }.trim()
-
         val miSecuencia = secuencia
         // Tras el recuento: pausa exacta de 3 s y dos vibraciones largas.
         handler.postDelayed({
             if (miSecuencia != secuencia) return@postDelayed
-            if (avisos.isNotEmpty()) {
-                texto(avisos)
-                morse.play(avisos, Patron.AVISO.tiempos, onFin = {
-                    if (miSecuencia == secuencia) anunciarInicioYResolver(s)
-                })
-            } else anunciarInicioYResolver(s)
+            anunciarInicioYResolver(s)
         }, pulsos.sum() + 3000)
 
     }
