@@ -25,7 +25,8 @@ enum class Patron(val tiempos: LongArray) {
     MARCA_OPCION(longArrayOf(0, 50)),                       // antes de una opción
     MARCA_ELEGIDA(longArrayOf(0, 50, 80, 50, 80, 50)),      // antes de la opción que ya marcaste
     RESPUESTA_GUARDADA(longArrayOf(0, 40, 60, 40, 60, 40, 60, 300)),
-    FIN(longArrayOf(0, 700, 200, 700))                      // fin de examen / resumen
+    FIN(longArrayOf(0, 700, 200, 700)),                     // fin de examen / resumen
+    FOTO_INCOMPLETA(longArrayOf(0, 75, 180, 75))             // dos pulsos cortos: repetir fotografía
 }
 
 class Haptics(context: Context) {
