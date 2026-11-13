@@ -376,7 +376,7 @@ class MainActivity : ComponentActivity(), MotionSensor.Listener {
         val s = lectura.sesion
         log("Leídas ${s.preguntas.size} · cortadas ${lectura.incompletas} · saltos ${lectura.saltos}")
 
-        if (s.preguntas.isEmpty()) {
+        if (s.preguntas.isEmpty() && lectura.incompletas.isEmpty()) {
             estado = Estado.CAMARA
             status("No encuentro enunciados completos · repite la foto")
             morse.play("NO HAY PREGUNTAS", Patron.AVISO.tiempos)
