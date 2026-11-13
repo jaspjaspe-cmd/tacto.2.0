@@ -67,7 +67,7 @@ class Haptics(context: Context) {
         val tiemposAplicados = if (tieneControlAmplitud) {
             tiempos
         } else {
-            val factorDuracion = floatArrayOf(0f, 0.25f, 0.40f, 0.58f, 0.78f, 1.0f)[intensidad]
+            val factorDuracion = floatArrayOf(0f, 0.10f, 0.25f, 0.48f, 0.72f, 1.0f)[intensidad]
             LongArray(tiempos.size) { i ->
                 if (i % 2 == 1) (tiempos[i] * factorDuracion).toLong().coerceAtLeast(1L)
                 else tiempos[i]
@@ -75,7 +75,7 @@ class Haptics(context: Context) {
         }
 
         if (tieneControlAmplitud) {
-            val amplitud = intArrayOf(0, 12, 28, 55, 100, 160)[intensidad]
+            val amplitud = intArrayOf(0, 4, 12, 40, 90, 160)[intensidad]
             val amplitudes = IntArray(tiemposAplicados.size) { i ->
                 if (i % 2 == 0) 0 else amplitud
             }
